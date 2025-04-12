@@ -14,5 +14,27 @@ Login with valid credentials
     Sleep    4
     Page Should Contain    juhaszszabolcs90
 
+    # Szöveg kijelölése JavaScript segítségével
+    ${selection_script}=    Catenate    SEPARATOR=\n
+    ...    function selectText() {
+    ...        const xpath = "/html/body/div/main/div/div[1]/p[2]";
+    ...        const element = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    ...        
+    ...        if (element) {
+    ...            const selection = window.getSelection();
+    ...            const range = document.createRange();
+    ...            range.selectNodeContents(element);
+    ...            selection.removeAllRanges();
+    ...            selection.addRange(range);
+    ...            return true;
+    ...        }
+    ...        return false;
+    ...    }
+    ...    return selectText();
+    
+    Execute JavaScript    ${selection_script}
+    Sleep    2s
+    
+    Execute JavaScript    ${selection_script}
     Sleep    2s
     Close Browser
