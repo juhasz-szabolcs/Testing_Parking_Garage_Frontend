@@ -22,3 +22,10 @@ Test Login Endpoint Success
     Should Be Equal    ${response_json['message']}    Login successful.
     ${user_id}=    Get From Dictionary    ${response_json}    userId
     Set Global Variable    ${USER_ID}    ${user_id}
+
+Test Login Endpoint Invalid Credentials
+    Create Session    parking_api    ${BASE_URL}    verify=${False}
+    ${headers}=    Create Dictionary    Content-Type=application/json
+    ${data}=    Create Dictionary    email=invalid@email.com    password=wrongpass
+    ${response}=    POST On Session    parking_api    /api/users/login    json=${data}    headers=${headers}    expected_status=401
+    Should Be Equal As Strings    ${response.text}    Invalid email or password.
