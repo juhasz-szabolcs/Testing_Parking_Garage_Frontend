@@ -29,3 +29,21 @@ Test Login Endpoint Invalid Credentials
     ${data}=    Create Dictionary    email=invalid@email.com    password=wrongpass
     ${response}=    POST On Session    parking_api    /api/users/login    json=${data}    headers=${headers}    expected_status=401
     Should Be Equal As Strings    ${response.text}    Invalid email or password.
+
+Test Get Cars Endpoint
+    [Setup]    Login And Get UserId
+    Create Session    parking_api    ${BASE_URL}    verify=${False}
+    ${headers}=    Create Dictionary    Authorization=Bearer ${USER_ID}
+    ${response}=    GET On Session    parking_api    /api/cars    headers=${headers}
+    Status Should Be    200    ${response}
+    ${cars}=    Get From Dictionary    ${response.json()}    cars
+    Length Should Be    ${cars}    3
+
+*** Keywords ***
+Login And Get UserId
+    Create Session    parking_api    ${BASE_URL}    verify=${False}
+    ${headers}=    Create Dictionary    Content-Type=application/json
+    ${data}=    Create Dictionary    email=${VALID_EMAIL}    password=${VALID_PASSWORD}
+    ${response}=    POST On Session    parking_api    /api/users/login    json=${data}    headers=${headers}
+    ${user_id}=    Get From Dictionary    ${response.json()}    userId
+    Set Global Variable    ${USER_ID}    ${user_id}
