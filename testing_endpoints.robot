@@ -1,0 +1,24 @@
+*** Settings ***
+Library           RequestsLibrary
+Library           Collections
+
+*** Variables ***
+${BASE_URL}       https://parkinggarageapibackend.onrender.com
+${VALID_EMAIL}    juhaszszabolcs90@gmail.com
+${VALID_PASSWORD}    Audi
+
+*** Test Cases ***
+Test Login Endpoint Success
+    Create Session    parking_api    ${BASE_URL}
+    ${headers}=    Create Dictionary    Content-Type=application/json
+    ${data}=    Create Dictionary    email=${VALID_EMAIL}    password=${VALID_PASSWORD}
+    ${response}=    POST On Session    parking_api    /api/users/login    json=${data}    headers=${headers}
+    Log    Response Status: ${response.status_code}
+    Log    Response Body: ${response.text}
+    Status Should Be    200    ${response}
+    ${response_json}=    Set Variable    ${response.json()}
+    Dictionary Should Contain Key    ${response_json}    userId
+    Dictionary Should Contain Key    ${response_json}    message
+    Should Be Equal    ${response_json['message']}    Login successful.
+    ${user_id}=    Get From Dictionary    ${response_json}    userId
+    Set Global Variable    ${USER_ID}    ${user_id}
